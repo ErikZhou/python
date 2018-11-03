@@ -22,7 +22,7 @@ main.login(user,pwd)
 
 
 def fast_download(url,filename):
-    chunk_count = 8
+    chunk_count = 1
     downloader = Downloader(url, filename, chunk_count)
     downloader.start_sync()
     #downloader.start()
@@ -67,16 +67,15 @@ def create_dir(path):
 def down_file( url,folder ):
     name = url[url.rfind("/") + 1:] 
     file_name = folder + "/" + unquote(name)
-    if not os.path.isfile(file_name):
-        print(url)
-        fast_download(url, file_name)
-        print(file_name)
-    else:
-        print(file_name)
-    #with urllib.request.urlopen(url) as response, open(file_name, 'wb') as out_file:
-    #    data = response.read() # a `bytes` object
-    #    out_file.write(data)
-    
+    #if not os.path.isfile(file_name):
+    print(url)
+        #fast_download(url, file_name)
+    print(file_name)
+    #else:
+        #print(file_name)
+    with urllib.request.urlopen(url) as response, open(file_name, 'wb') as out_file:
+        data = response.read() # a `bytes` object
+        out_file.write(data)
     return file_name;
 
 count = 0
@@ -85,8 +84,8 @@ def downfile(url, folder):
     name = url[url.rfind("/") + 1:] 
     file_name = unquote(name)
     #folder = './' + folder  
-    count += 1
-    file_name = str(count) + '.mp4'
+    #count += 1
+    #file_name = str(count) + '.mp4'
     #wget.download(url, file_name)
     filename = wget.download(url)
     print(file_name)
@@ -122,6 +121,7 @@ folder1 = []
 folder0 = ""
 name = ""
 
+count = 0
 def down_folder( url,fold):
     html = urlopen(url)
     bsObj = BeautifulSoup(html, 'html.parser')
@@ -131,7 +131,7 @@ def down_folder( url,fold):
         a = h
         if a is not None and 'href' in a.attrs:
             l = a.get('href')
-            print(l)
+            #print(l)
             root = webroot + l      
             if len( root ) < len(myurl) :
                 if root[-1:] == '/' :
@@ -141,21 +141,32 @@ def down_folder( url,fold):
                     folder1.append(root)
                     #print(root)
             try:
-                if root[-1:] != '/' :
+                if root[-4:] == '.dcm' :
                     print(root)
-                    urls.append(root)
-                    #down_file(root, fold)
+                    newroot="https://raw.githubusercontent.com" + root[len(webroot):]
+                    urls.append(newroot)
+                    count += 1
+                    if count > 5 :
+                        break;
+                        return;
+                    #down_file(root, fold) 
                 #filename = wget.download(root)
                 #print(filename)
             except:
                 pass
     return;
 
-down_folder(myurl,folder)      
-
+down_folder(myurl,folder)    
+create_folder('./dcm')
+print("Download Start")
+folder = "./dcm"
 for u in urls:
-    down_file(u, folder)
-    
+    try:
+        down_file(u, folder)
+    except:
+        pass  
+print("Download End")
+
 print('====folder1====')
 for h in folder1:
     print(h)
@@ -164,7 +175,7 @@ for h in folder1:
     folder1_1 = "./" + folder + "/" + name
     print(folder1_1)
     create_dir(folder1_1)
-    down_folder(h, folder1_1)
+    down_folder(h, folder1_1)   
 print('====Done====')
 easygui.msgbox(folder, title="====Done====")
 
