@@ -142,8 +142,9 @@ def down_folder( url,fold):
                     #print(root)
             try:
                 if root[-4:] == '.dcm' :
-                    print(root)
+                    #print(root)
                     newroot="https://raw.githubusercontent.com" + root[len(webroot):]
+                    newroot = newroot.replace("blob/", "")
                     urls.append(newroot)
                     count += 1
                     if count > 5 :
