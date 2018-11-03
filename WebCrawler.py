@@ -9,6 +9,18 @@ import easygui
 from pget.down import Downloader
 import os.path
 
+import login
+import setting
+
+user = setting.USER
+pwd  = setting.PWD
+
+webroot = "https://github.com"
+
+main = login.Login()
+main.login(user,pwd)
+
+
 def fast_download(url,filename):
     chunk_count = 8
     downloader = Downloader(url, filename, chunk_count)
@@ -114,12 +126,13 @@ def down_folder( url,fold):
     html = urlopen(url)
     bsObj = BeautifulSoup(html, 'html.parser')
     t1 = bsObj.find_all('a')
-    for h in bsObj.find_all('li'):
-        a = h.find('a')
+    for h in t1:
+        #a = h.find('a')
+        a = h
         if a is not None and 'href' in a.attrs:
             l = a.get('href')
-            #print(l)
-            root = '' + l      
+            print(l)
+            root = webroot + l      
             if len( root ) < len(myurl) :
                 if root[-1:] == '/' :
                     urlshort = root[0:len(root)-1]
@@ -139,6 +152,10 @@ def down_folder( url,fold):
     return;
 
 down_folder(myurl,folder)      
+
+for u in urls:
+    down_file(u, folder)
+    
 print('====folder1====')
 for h in folder1:
     print(h)
